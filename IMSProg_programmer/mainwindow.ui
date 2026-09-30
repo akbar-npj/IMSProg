@@ -1101,6 +1101,7 @@ QPushButton::pressed{background-color: rgb(115, 210, 22);}</string>
     <addaction name="actionCH347T"/>
     <addaction name="actionCH347T_v1_1"/>
     <addaction name="actionFT232H_v1_2"/>
+    <addaction name="actionEZP2023"/>
     <addaction name="separator"/>
     <addaction name="actionShow_programmer_version"/>
    </widget>
@@ -1556,6 +1557,14 @@ QPushButton::pressed{background-color: rgb(115, 210, 22);}</string>
     </property>
     <property name="text">
      <string>FT232H v1.2</string>
+    </property>
+   </action>
+   <action name="actionEZP2023">
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string>EZP2023+ / EZP2019</string>
     </property>
    </action>
   </actiongroup>

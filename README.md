@@ -15,12 +15,13 @@
 
 **IMSProg** - **I**2C, **M**icroWire and **S**PI EEPROM/Flash chip
 **Prog**rammer - is a program to read, write EEPROM chips use the
-`CH341A programmer` device, `CH347T programmer` device and `FT232H v1.2
-programmer` device.
+`CH341A programmer` device, `CH347T programmer` device, `FT232H v1.2
+programmer` device and `EZP2023+ / EZP2019 programmer` device.
 
-| CH341A/B v1.2 | CH341A v1.7| CH347T v1.0| CH347T v1.1| FT232H v1.2|
-| :---:         | :---:      | :---:      | :---:      | :---:      |
-| ![CH341A black](img/ch341_black150.png)  ![CH341A green](img/ch341_green150.png) | ![CH341A green](img/ch341v1_7.png) |![CH347T v1.0](img/ch347_150.png) |![CH347T v1.1](img/ch347_v1_1_150.png) |![CH347T v1.1](img/ft232h_150.png) |
+| CH341A/B v1.2 | CH341A v1.7| CH347T v1.0| CH347T v1.1| FT232H v1.2| EZP2023+ / EZP2019 |
+| :---:         | :---:      | :---:      | :---:      | :---:      | :---:              |
+| ![CH341A black](img/ch341_black150.png)  ![CH341A green](img/ch341_green150.png) | ![CH341A green](img/ch341v1_7.png) |![CH347T v1.0](img/ch347_150.png) |![CH347T v1.1](img/ch347_v1_1_150.png) |![FT232H v1.2](img/ft232h_150.png) | EZP2019 / EZP2023+ |
+
 
 The IMSProg makes respect to [QHexEdit2](https://github.com/Simsys/qhexedit2)
 hex editor and [SNANDer programmer](https://github.com/McMCCRU/SNANDer). The
@@ -41,10 +42,47 @@ web-server.
 ![CH341A EEPROM programmer](img/IMSProg.png)
 
 ## Compiling project
-```
-git clone https://github.com/bigbigmdm/IMSProg.git && cd IMSProg
+
+### Standard Build
+```bash
+git clone https://github.com/akbar-npj/IMSProg.git && cd IMSProg
 sudo ./build_all.sh
 ```
+
+### ARM64 / AArch64 (4K & 16K Kernel Page Size Support)
+When building on ARM64 architectures (such as Apple Silicon running Asahi Linux, Raspberry Pi 4/5, or Linux server boards), IMSProg builds with 64KB max ELF segment alignment (`-Wl,-z,max-page-size=65536`). This ensures the compiled binaries load seamlessly across kernels configured with **4KB pages** (standard Debian/Ubuntu/Fedora, Raspberry Pi 4) as well as **16KB pages** (Raspberry Pi 5 default, Apple Silicon Asahi Linux).
+
+```bash
+mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build . -j$(nproc)
+sudo cmake --install .
+```
+
+### Building Fedora / RHEL RPM Package
+```bash
+# Prepare source archive
+mkdir -p ~/rpmbuild/SOURCES
+tar --transform 's|^|IMSProg-1.9.1/|' --exclude='.git' --exclude='build*' -czf ~/rpmbuild/SOURCES/v1.9.1.tar.gz -C . .
+
+# Build RPM (architecture-aware, produces 64k-aligned binary)
+rpmbuild -ba rpm/imsprog.spec
+```
+
+### Building Debian / Ubuntu ARM64 Package (.deb)
+To produce a native Debian package with exact runtime library dependencies:
+```bash
+# Create build directory and compile
+mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build . -j$(nproc)
+
+# Install into staging area
+DESTDIR=/tmp/pkg cmake --install .
+
+# Package with dpkg-deb (see build_debian_package.sh in parent repo)
+```
+
 
 ## System software requirements
 

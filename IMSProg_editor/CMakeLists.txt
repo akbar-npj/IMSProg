@@ -9,6 +9,11 @@ set(CMAKE_AUTOUIC ON)
 
 project(IMSProg_editor LANGUAGES CXX)
 
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+    add_link_options("-Wl,-z,max-page-size=65536")
+endif()
+
+
 # Set the CMAKE_INSTALL_PREFIX to /usr if not specified and /usr/local for macOS
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

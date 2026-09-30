@@ -12,9 +12,14 @@ project(IMSProg LANGUAGES C CXX)
 include(FindPkgConfig)
 pkg_check_modules(LIBUSB REQUIRED IMPORTED_TARGET libusb-1.0)
 pkg_check_modules(LIBFTDI REQUIRED IMPORTED_TARGET libftdi1)
+link_directories(${LIBFTDI_LIBRARY_DIRS} ${LIBUSB_LIBRARY_DIRS} /home/shaanair/.local/lib64)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_INSTALL_DO_STRIP FALSE)
+endif()
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+    add_link_options("-Wl,-z,max-page-size=65536")
 endif()
 
 get_filename_component(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
@@ -178,6 +183,8 @@ add_executable(${PROJECT_NAME}
     bitbang_microwire.c
     ch341a_gpio.c
     ch341a_spi.c
+    ezp2023_spi.c
+    ezp2023_spi.h
     ch34x_i2c.c
     ch347.c
     mw_eeprom.c

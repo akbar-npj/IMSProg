@@ -352,5 +352,7 @@ void DialogNandSecurity::setDeviceType(const uint8_t pType)
 {
     programmerType = pType;
     if (programmerType < 2)  programmerName ="CH341A";
-    if (programmerType == 2) programmerName ="CH347T";
+    if ((programmerType == 2) || (programmerType == 3)) programmerName ="CH347T";
+    if (programmerType == 4) programmerName ="FT232H";
+    if (programmerType == 5) programmerName ="EZP2023+";
 }

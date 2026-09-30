@@ -137,6 +137,7 @@ private slots:
     void handleScroll();
     void clearCheckboxes();
     void on_actionFT232H_v1_2_triggered();
+    void on_actionEZP2023_triggered();
 
 private:
     Ui::MainWindow *ui;

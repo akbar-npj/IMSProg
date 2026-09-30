@@ -140,7 +140,9 @@ IMSProg_database_update - 使用外部Web服务器更新芯片数据库的脚本
 %autosetup -p1 -n IMSProg-%{version}
 
 %build
+export PKG_CONFIG_PATH="/home/shaanair/.local/lib64/pkgconfig:$PKG_CONFIG_PATH"
 # update translations
+
 lrelease-qt6 IMSProg_editor/language/*.ts
 lrelease-qt6 IMSProg_programmer/language/*.ts
 lrelease-qt6 IMSProg_database_update/language/*.ts

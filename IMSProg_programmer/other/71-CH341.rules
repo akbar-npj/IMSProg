@@ -1,6 +1,8 @@
 # This file should be copied to /etc/udev/rules.d on GNU/Linux OS and derived
 # Add permission to all user to have complete acces to eeprom programmers
-# CH341A/B, CH347, FT232H
+# CH341A/B, CH347, FT232H, EZP2023+/EZP2019
 SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="5512|55db", TAG+="uaccess"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1fc8", ATTRS{idProduct}=="310b|310c|310d", TAG+="uaccess"
+
 

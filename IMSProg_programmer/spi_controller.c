@@ -38,6 +38,7 @@
 #include "spi_controller.h"
 #include "ch347.h"
 #include "ft232all.h"
+#include "ezp2023_spi.h"
 
 extern struct ch347_priv *priv;
 
@@ -65,6 +66,9 @@ int ProgDeviceInit( u8 deviceType, u8 chipType, u16 speed )
             if (chipType == 1) ft232hSetSpeedI2C(speed);
             if (chipType == 2) ft232hSetSpeedI2C(20);
             if (chipType  > 2) ft232hSetSpeedSPI(speed);
+            break;
+        case 5: // EZP2023+ / EZP2019
+            ret = ezp2023_spi_init(chipType, speed);
             break;
         default: //Unsupported types
             ret = -1;
@@ -96,6 +100,9 @@ int ProgDeviceClose( u8 deviceType )
         closeFt232h();
         ret = 0;
         break;
+    case 5: // EZP2023+ / EZP2019
+        ret = ezp2023_spi_shutdown();
+        break;
     default: //Unsupported types
         ret = -1;
         break;
@@ -122,6 +129,9 @@ int getDeviceDescriptor(u8 *data, u8 deviceType)
     case 4: // FT232H v1.2
         ft232hGetDescriptor(data);
         break;
+    case 5: // EZP2023+ / EZP2019
+        ezp2023_get_descriptor(data);
+        break;
     default: //Unsupported types
         return -1;
         break;
@@ -132,13 +142,14 @@ int getDeviceDescriptor(u8 *data, u8 deviceType)
 uint16_t getInterfaceSpeed(u8 deviceType, u8 chipType, u16 delay)
 {
     u16 interfaceSpeed = 400;
-    static u16 defaultSpeed[6][7] = {
+    static u16 defaultSpeed[7][7] = {
         //SPINOR 24xx   93xx   25xx   95xx   45xx   SPINAND
         { 1600,   400,  1600,  1600,  1600,  1600,  1600}, // CH341A v1.2
         { 1600,   400,  1600,  1600,  1600,  1600,  1600}, // CH341A v1.7
         {30000,   400,  1600,  5000,  5000,  5000, 60000}, // CH347T v1.0
         {15000,   400,  1600,  5000,  5000,  5000, 15000}, // CH347T v1.1
         {30000,   400,  1600,  5000,  5000,  5000, 30000}, // FT232H v1.2
+        {12000,   400,  1000,  5000,  5000,  5000, 12000}, // EZP2023+
         {30000,   400,  1600,  5000,  5000,  5000, 30000}  // Reserved
     };
     if ((delay > 40) && (delay < 2100)) interfaceSpeed = defaultSpeed[deviceType][chipType] * delay / 1000;
@@ -172,6 +183,9 @@ SPI_CONTROLLER_RTN_T SPI_CONTROLLER_Write_One_Byte( u8  data, u8 deviceType )
     case 4: // FT232H v1.2
         return (SPI_CONTROLLER_RTN_T)ft232WriteNbytes(&data, 1);
         break;
+    case 5: // EZP2023+ / EZP2019
+        return (SPI_CONTROLLER_RTN_T)ezp2023_spi_send_command(1, 0, &data, NULL);
+        break;
     }
 }
 
@@ -193,6 +207,9 @@ SPI_CONTROLLER_RTN_T SPI_CONTROLLER_Chip_Select_High( u8 deviceType )
         break;
     case 4: // FT232H v1.2
         return (SPI_CONTROLLER_RTN_T)ft232h_CS_HI();
+        break;
+    case 5: // EZP2023+ / EZP2019
+        return (SPI_CONTROLLER_RTN_T)ezp2023_enable_pins(false);
         break;
     }
 }
@@ -216,6 +233,9 @@ SPI_CONTROLLER_RTN_T SPI_CONTROLLER_Chip_Select_Low( u8 deviceType )
     case 4: // FT232H v1.2
         return (SPI_CONTROLLER_RTN_T)ft232h_CS_LO();
         break;
+    case 5: // EZP2023+ / EZP2019
+        return (SPI_CONTROLLER_RTN_T)ezp2023_enable_pins(true);
+        break;
     }
 }
 
@@ -238,6 +258,9 @@ SPI_CONTROLLER_RTN_T SPI_CONTROLLER_Read_NByte( u8 *ptr_rtn_data, u32 len, SPI_C
     case 4: // FT232H v1.2
         return (SPI_CONTROLLER_RTN_T)ft232ReadNbytes(ptr_rtn_data, len);
         break;
+    case 5: // EZP2023+ / EZP2019
+        return (SPI_CONTROLLER_RTN_T)ezp2023_spi_send_command(0, len, NULL, ptr_rtn_data);
+        break;
     }
 }
 
@@ -259,6 +282,9 @@ SPI_CONTROLLER_RTN_T SPI_CONTROLLER_Write_NByte( u8 *ptr_data, u32 len, SPI_CONT
         break;
     case 4: // FT232H v1.2
         return (SPI_CONTROLLER_RTN_T)ft232WriteNbytes(ptr_data, len);
+        break;
+    case 5: // EZP2023+ / EZP2019
+        return (SPI_CONTROLLER_RTN_T)ezp2023_spi_send_command(len, 0, ptr_data, NULL);
         break;
     }
 }

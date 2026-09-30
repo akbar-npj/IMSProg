@@ -167,6 +167,7 @@ MainWindow::MainWindow(QWidget *parent) :
               SetItemStatus("comboBox_type", 2, true);
           }
        if (current_programmer == 4) ui->actionFT232H_v1_2->setChecked(true);
+       if (current_programmer == 5) ui->actionEZP2023->setChecked(true);
      settings.endGroup();
      settings.beginGroup("FormPosition");
      if (settings.contains("geometry"))
@@ -179,6 +180,7 @@ MainWindow::MainWindow(QWidget *parent) :
  if (current_programmer < 2) ui->lStatus->setText("CH341A");
  if ((current_programmer == 2) || (current_programmer == 3)) ui->lStatus->setText("CH347T");
  if (current_programmer == 4) ui->lStatus->setText("FT232H");
+ if (current_programmer == 5) ui->lStatus->setText("EZP2023+");
  statusCH341 =  ProgDeviceInit(current_programmer, currentChipType, currentI2CBusSpeed);
  ch341StatusFlashing();
  ProgDeviceClose(current_programmer);
@@ -1986,6 +1988,8 @@ void MainWindow::doNotDisturb()
    ui->actionCH341A_v1_7->setDisabled(true);
    ui->actionCH347T->setDisabled(true);
    ui->actionCH347T_v1_1->setDisabled(true);
+   ui->actionFT232H_v1_2->setDisabled(true);
+   ui->actionEZP2023->setDisabled(true);
    ui->actionShow_programmer_version->setDisabled(true);
 
    ui->pushButton->blockSignals(true);
@@ -2042,6 +2046,8 @@ void MainWindow::doNotDisturbCancel()
    ui->actionCH341A_v1_7->setDisabled(false);
    ui->actionCH347T->setDisabled(false);
    ui->actionCH347T_v1_1->setDisabled(false);
+   ui->actionFT232H_v1_2->setDisabled(false);
+   ui->actionEZP2023->setDisabled(false);
    ui->actionShow_programmer_version->setDisabled(false);
    if ((currentChipType == 0) || (currentChipType == 6) || (currentChipType > 2)) ui->actionChip_info->setDisabled(false);
    if ((currentChipType == 0) || (currentChipType == 6)) ui->actionSecurity_registers->setDisabled(false);
@@ -2717,6 +2723,14 @@ void MainWindow::on_actionFT232H_v1_2_triggered()
     current_programmer = 4;
     ui->lStatus->setText("FT232H");
     SetItemStatus("comboBox_type", 2, false);
+    SetItemStatus("comboBox_vcc", 3, false);
+}
+
+void MainWindow::on_actionEZP2023_triggered()
+{
+    current_programmer = 5;
+    ui->lStatus->setText("EZP2023+");
+    SetItemStatus("comboBox_type", 2, true);
     SetItemStatus("comboBox_vcc", 3, false);
 }
 
